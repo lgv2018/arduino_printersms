@@ -102,14 +102,14 @@ void loop() {
     printer.feed(1);
     printer.println(F("============="));
     printer.feed(2);
-    printer.sleep();      // Tell printer to sleep
+    //printer.sleep();      // Tell printer to sleep
     
     sms.flush(); // Delete message from modem memory
     if (usbdebug == true) {
       Serial.println("MESSAGE DELETED");
     }
     delay(3000L);         // Sleep for 3 seconds
-    printer.wake();       // MUST wake() before printing again, even if reset
+    //printer.wake();       // MUST wake() before printing again, even if reset
     printer.setDefault(); // Restore printer to defaults
   }
 
