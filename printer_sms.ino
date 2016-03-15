@@ -16,14 +16,17 @@ GSM_SMS sms;
 // Array to hold the number a SMS is retreived from
 char senderNumber[20];
 
-void setup() {
-  // initialize serial communications and wait for port to open:
-  Serial.begin(9600);
-  while (!Serial) {
-    ; // wait for serial port to connect. Needed for native USB port only
-  }
+bool usbdebug = false;
 
-  Serial.println("SMS Messages Receiver");
+void setup() {
+  if (usbdebug == true) {
+    // initialize serial communications and wait for port to open:
+    Serial.begin(9600);
+    while (!Serial) {
+      ; // wait for serial port to connect. Needed for native USB port only
+    }
+    Serial.println("SMS Messages Receiver");
+  }
 
   // connection state
   boolean notConnected = true;
@@ -33,13 +36,17 @@ void setup() {
     if (gsmAccess.begin(PINNUMBER) == GSM_READY) {
       notConnected = false;
     } else {
-      Serial.println("Not connected");
+      if (usbdebug == true) {
+        Serial.println("Not connected");
+      }
       delay(1000);
     }
   }
 
-  Serial.println("GSM initialized");
-  Serial.println("Waiting for messages");
+  if (usbdebug == true) {
+    Serial.println("GSM initialized");
+    Serial.println("Waiting for messages");
+  }
 
   
   // NOTE: SOME PRINTERS NEED 9600 BAUD instead of 19200, check test page.
@@ -50,16 +57,22 @@ void loop() {
   char c;
   // If there are any SMSs available()
   if (sms.available()) {
-    Serial.println("Message received from:");
+    if (usbdebug == true) {
+      Serial.println("Message received from:");
+    }
 
     // Get remote number
     sms.remoteNumber(senderNumber, 20);
-    Serial.println(senderNumber);
+    if (usbdebug == true) {
+      Serial.println(senderNumber);
+    }
 
     // An example of message disposal
     // Any messages starting with # should be discarded
     if (sms.peek() == '#') {
-      Serial.println("Discarded SMS");
+      if (usbdebug == true) {
+        Serial.println("Discarded SMS");
+      }
       sms.flush();
     }
 
@@ -92,7 +105,9 @@ void loop() {
     printer.sleep();      // Tell printer to sleep
     
     sms.flush(); // Delete message from modem memory
-    Serial.println("MESSAGE DELETED");
+    if (usbdebug == true) {
+      Serial.println("MESSAGE DELETED");
+    }
     delay(3000L);         // Sleep for 3 seconds
     printer.wake();       // MUST wake() before printing again, even if reset
     printer.setDefault(); // Restore printer to defaults
