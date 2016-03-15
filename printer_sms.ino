@@ -51,6 +51,7 @@ void setup() {
   
   // NOTE: SOME PRINTERS NEED 9600 BAUD instead of 19200, check test page.
   mySerial.begin(19200);  // Initialize SoftwareSerial
+  printer.begin();        // Init printer (same regardless of serial type)
 }
 
 void loop() {
@@ -76,7 +77,7 @@ void loop() {
       sms.flush();
     }
 
-    printer.begin();        // Init printer (same regardless of serial type)
+    
     // The following calls are in setup(), but don't *need* to be.  Use them
     // anywhere!  They're just here so they run one time and are not printed
     // over and over (which would happen if they were in loop() instead).
