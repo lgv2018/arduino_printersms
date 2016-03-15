@@ -118,6 +118,7 @@ bool printSms () {
   printer.setSize('S');
   while (c = sms.read()) {
     printer.print(c);
+    delay(10);
   }
   printer.feed(2);
   printer.setSize('S');
@@ -125,7 +126,7 @@ bool printSms () {
   printer.feed(2);
   //printer.sleep();      // Tell printer to sleep
   
-  //delay(3000);         // Sleep for 3 seconds
+  delay(3000);         // Sleep for 3 seconds
   printer.wake();       // MUST wake() before printing again, even if reset
   //printer.setDefault(); // Restore printer to defaults
   return true;
