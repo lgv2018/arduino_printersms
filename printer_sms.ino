@@ -81,25 +81,25 @@ void loop() {
     // anywhere!  They're just here so they run one time and are not printed
     // over and over (which would happen if they were in loop() instead).
     // Some functions will feed a line when called, this is normal.
-    printer.setSize('L');        // Set type size, accepts 'S', 'M', 'L'
+    printer.setSize('S');        // Set type size, accepts 'S', 'M', 'L'
     printer.println(senderNumber);
     printer.boldOn();
+    printer.setSize('S');
     printer.println(F("Envoi de Rod"));
     printer.boldOff();
-    printer.setSize('S');
     printer.feed(1);
+    printer.setSize('S');
     printer.println(F("-------------"));
     printer.feed(1);
     //printer.underlineOn();
     //printer.println(F("Underlined text"));
     //printer.underlineOff();
     printer.setSize('M');
-    printer.println(F(""));
     while (c = sms.read()) {
       printer.print(c);
     }
+    printer.feed(2);
     printer.setSize('S');
-    printer.feed(1);
     printer.println(F("============="));
     printer.feed(2);
     //printer.sleep();      // Tell printer to sleep
