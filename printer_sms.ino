@@ -62,6 +62,7 @@ void loop() {
   }
   // If there are any SMSs available()
   if (sms.available()) {
+    bool endPrinting = false;
     if (usbdebug == true) {
       Serial.println("Message received from:");
     }
@@ -81,9 +82,13 @@ void loop() {
       sms.flush();
     }
     if (usbdebug == false) {
-      printSms();
+      endPrinting = printSms();
+    } else {
+      endPrinting = true;
     }
-    sms.flush(); // Delete message from modem memory
+    if (true == endPrinting) {
+      sms.flush(); // Delete message from modem memory
+    }
     if (usbdebug == true) {
       Serial.println("MESSAGE DELETED");
     }
@@ -91,7 +96,7 @@ void loop() {
   delay(1000);
 }
 
-void printSms () {
+bool printSms () {
   char c;
   // The following calls are in setup(), but don't *need* to be.  Use them
   // anywhere!  They're just here so they run one time and are not printed
@@ -123,4 +128,5 @@ void printSms () {
   //delay(3000);         // Sleep for 3 seconds
   printer.wake();       // MUST wake() before printing again, even if reset
   //printer.setDefault(); // Restore printer to defaults
+  return true;
 }
