@@ -10,7 +10,7 @@
 SoftwareSerial mySerial(RX_PIN, TX_PIN); // Declare SoftwareSerial obj first
 Adafruit_Thermal printer(&mySerial);     // Pass addr to printer constructor
 
-GSM gsmAccess;
+GSM gsmAccess(true);
 GSM_SMS sms;
 
 // Array to hold the number a SMS is retreived from
@@ -50,12 +50,16 @@ void setup() {
 
   
   // NOTE: SOME PRINTERS NEED 9600 BAUD instead of 19200, check test page.
-  mySerial.begin(19200);  // Initialize SoftwareSerial
-  printer.begin();        // Init printer (same regardless of serial type)
+  if (usbdebug == false) {
+    mySerial.begin(19200);  // Initialize SoftwareSerial
+    printer.begin();        // Init printer (same regardless of serial type)
+  }
 }
 
 void loop() {
-  char c;
+  if (usbdebug == false) {
+    printer.wake(); 
+  }
   // If there are any SMSs available()
   if (sms.available()) {
     if (usbdebug == true) {
@@ -76,43 +80,47 @@ void loop() {
       }
       sms.flush();
     }
-
-    
-    // The following calls are in setup(), but don't *need* to be.  Use them
-    // anywhere!  They're just here so they run one time and are not printed
-    // over and over (which would happen if they were in loop() instead).
-    // Some functions will feed a line when called, this is normal.
-    printer.setSize('S');        // Set type size, accepts 'S', 'M', 'L'
-    printer.println(senderNumber);
-    printer.boldOn();
-    printer.setSize('S');
-    printer.println(F("Envoi de Rod"));
-    printer.boldOff();
-    printer.feed(1);
-    printer.setSize('S');
-    printer.println(F("-------------"));
-    printer.feed(1);
-    //printer.underlineOn();
-    //printer.println(F("Underlined text"));
-    //printer.underlineOff();
-    printer.setSize('M');
-    while (c = sms.read()) {
-      printer.print(c);
+    if (usbdebug == false) {
+      printSms();
     }
-    printer.feed(2);
-    printer.setSize('S');
-    printer.println(F("============="));
-    printer.feed(2);
-    //printer.sleep();      // Tell printer to sleep
-    
     sms.flush(); // Delete message from modem memory
     if (usbdebug == true) {
       Serial.println("MESSAGE DELETED");
     }
-    delay(3000L);         // Sleep for 3 seconds
-    //printer.wake();       // MUST wake() before printing again, even if reset
-    printer.setDefault(); // Restore printer to defaults
   }
+  delay(1000);
+}
 
-  //delay(1000);
+void printSms () {
+  char c;
+  // The following calls are in setup(), but don't *need* to be.  Use them
+  // anywhere!  They're just here so they run one time and are not printed
+  // over and over (which would happen if they were in loop() instead).
+  // Some functions will feed a line when called, this is normal.
+  printer.setSize('S');        // Set type size, accepts 'S', 'M', 'L'
+  printer.println(senderNumber);
+  printer.boldOn();
+  printer.setSize('M');
+  printer.println(F("Envoi de Rod"));
+  printer.boldOff();
+  printer.feed(1);
+  printer.setSize('S');
+  printer.println(F("-------------"));
+  printer.feed(1);
+  //printer.underlineOn();
+  //printer.println(F("Underlined text"));
+  //printer.underlineOff();
+  printer.setSize('S');
+  while (c = sms.read()) {
+    printer.print(c);
+  }
+  printer.feed(2);
+  printer.setSize('S');
+  printer.println(F("============="));
+  printer.feed(2);
+  //printer.sleep();      // Tell printer to sleep
+  
+  //delay(3000);         // Sleep for 3 seconds
+  printer.wake();       // MUST wake() before printing again, even if reset
+  //printer.setDefault(); // Restore printer to defaults
 }
