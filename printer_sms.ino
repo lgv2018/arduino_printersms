@@ -17,13 +17,15 @@ AltSoftSerial mySerial;
 
 Adafruit_Thermal printer(&mySerial);     // Pass addr to printer constructor
 
-GSM gsmAccess(true);
+bool gsmdebug = false;
+GSM gsmAccess(gsmdebug);
 GSM_SMS sms;
 
 // Array to hold the number a SMS is retreived from
 char senderNumber[20];
 
 bool usbdebug = false;
+bool debugWithPrint = false;
 
 void setup() {
   if (usbdebug == true) {
@@ -61,14 +63,15 @@ void setup() {
     mySerial.begin(19200);  // Initialize SoftwareSerial
     printer.begin();        // Init printer (same regardless of serial type)
   }
+  initPrinter();
 }
 
 void loop() {
-  if (usbdebug == false) {
-    printer.wake(); 
-  }
   // If there are any SMSs available()
   if (sms.available()) {
+    if (usbdebug == false) {
+      //printer.wake(); 
+    }
     bool endPrinting = false;
     if (usbdebug == true) {
       Serial.println("Message received from:");
@@ -93,11 +96,16 @@ void loop() {
     } else {
       endPrinting = true;
     }
+    if (usbdebug == true) {
+      char c;
+      while (c = sms.read()) {
+        Serial.print(c);
+      }
+      Serial.println("\nEND OF MESSAGE");
+      Serial.println("MESSAGE DELETED");
+    }
     if (true == endPrinting) {
       sms.flush(); // Delete message from modem memory
-    }
-    if (usbdebug == true) {
-      Serial.println("MESSAGE DELETED");
     }
   }
   delay(1000);
@@ -105,6 +113,7 @@ void loop() {
 
 bool printSms () {
   char c;
+  printer.wake();
   // The following calls are in setup(), but don't *need* to be.  Use them
   // anywhere!  They're just here so they run one time and are not printed
   // over and over (which would happen if they were in loop() instead).
@@ -125,16 +134,28 @@ bool printSms () {
   printer.setSize('S');
   while (c = sms.read()) {
     printer.print(c);
-    delay(10);
+    //delay(10);
   }
   printer.feed(2);
   printer.setSize('S');
   printer.println(F("============="));
   printer.feed(2);
-  //printer.sleep();      // Tell printer to sleep
+  printer.sleep();      // Tell printer to sleep
   
   delay(3000);         // Sleep for 3 seconds
   printer.wake();       // MUST wake() before printing again, even if reset
-  //printer.setDefault(); // Restore printer to defaults
+  printer.setDefault(); // Restore printer to defaults
   return true;
+}
+
+void initPrinter () {
+  printer.wake();
+  printer.setSize('S');
+  printer.println(F("Printer Ready"));
+  printer.feed(2);
+  printer.setSize('S');
+  printer.println(F("============="));
+  printer.feed(2);
+  printer.sleep();      // Tell printer to sleep
+  delay(3000);         // Sleep for 3 seconds
 }
