@@ -28,7 +28,7 @@ char senderNumber[20];
 bool usbdebug = false;
 bool debugWithPrint = false;
 
-String allowedNumber = "+33645970094";
+//String allowedNumber = "+33645970094";
 
 void setup() {
   if (usbdebug == true) {
