@@ -3,6 +3,7 @@
 #include "SoftwareSerial.h"
 //#include <AltSoftSerial.h>
 #include <GSM.h>
+#include <WString.h>
 
 #define TX_PIN 6 // Arduino transmit  YELLOW WIRE  labeled RX on printer
 #define RX_PIN 5 // Arduino receive   GREEN WIRE   labeled TX on printer
@@ -26,6 +27,8 @@ char senderNumber[20];
 
 bool usbdebug = false;
 bool debugWithPrint = false;
+
+String allowedNumber = "+33645970094";
 
 void setup() {
   if (usbdebug == true) {
@@ -69,42 +72,58 @@ void setup() {
 void loop() {
   // If there are any SMSs available()
   if (sms.available()) {
-    if (usbdebug == false) {
-      //printer.wake(); 
-    }
-    bool endPrinting = false;
-    if (usbdebug == true) {
-      Serial.println("Message received from:");
-    }
-
     // Get remote number
     sms.remoteNumber(senderNumber, 20);
+    String snumber = senderNumber;
     if (usbdebug == true) {
       Serial.println(senderNumber);
     }
 
-    // An example of message disposal
-    // Any messages starting with # should be discarded
-    if (sms.peek() == '#') {
+    // Test si le numero est authorisé
+    if (snumber == allowedNumber) {
       if (usbdebug == true) {
-        Serial.println("Discarded SMS");
+        Serial.println("GOOD NUMBER");
       }
-      sms.flush();
-    }
-    if (usbdebug == false) {
-      endPrinting = printSms();
+      
+      bool endPrinting = false;
+      if (usbdebug == true) {
+        Serial.println("Message received from:");
+      }
+  
+      // An example of message disposal
+      // Any messages starting with # should be discarded
+      if (sms.peek() == '#') {
+        if (usbdebug == true) {
+          Serial.println("Discarded SMS");
+        }
+        sms.flush();
+      }
+      if (usbdebug == false) {
+        endPrinting = printSms();
+      } else {
+        endPrinting = true;
+      }
+      if (usbdebug == true) {
+        char c;
+        while (c = sms.read()) {
+          Serial.print(c);
+        }
+        Serial.println("\nEND OF MESSAGE");
+        Serial.println("MESSAGE DELETED");
+      }
+      if (true == endPrinting) {
+        sms.flush(); // Delete message from modem memory
+      }
     } else {
-      endPrinting = true;
-    }
-    if (usbdebug == true) {
-      char c;
-      while (c = sms.read()) {
-        Serial.print(c);
+      if (usbdebug == true) {
+        Serial.println("BAD NUMBER");
+        char c;
+        while (c = sms.read()) {
+          Serial.print(c);
+        }
+        Serial.println("\nEND OF MESSAGE");
+        Serial.println("MESSAGE DELETED");
       }
-      Serial.println("\nEND OF MESSAGE");
-      Serial.println("MESSAGE DELETED");
-    }
-    if (true == endPrinting) {
       sms.flush(); // Delete message from modem memory
     }
   }
