@@ -1,7 +1,7 @@
 // include the libraries
 #include "Adafruit_Thermal.h"
-//#include "SoftwareSerial.h"
-#include <AltSoftSerial.h>
+#include "SoftwareSerial.h"
+//#include <AltSoftSerial.h>
 #include <GSM.h>
 
 #define TX_PIN 6 // Arduino transmit  YELLOW WIRE  labeled RX on printer
@@ -12,8 +12,8 @@
 
 #define PINNUMBER "1234" // PIN Number for the SIM
 
-//SoftwareSerial mySerial(RX_PIN, TX_PIN); // Declare SoftwareSerial obj first
-AltSoftSerial mySerial;
+SoftwareSerial mySerial(RX_PIN, TX_PIN); // Declare SoftwareSerial obj first
+//AltSoftSerial mySerial;
 
 Adafruit_Thermal printer(&mySerial);     // Pass addr to printer constructor
 
