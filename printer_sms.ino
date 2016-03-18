@@ -1,4 +1,5 @@
 // include the libraries
+#include "config.h"
 #include "Adafruit_Thermal.h"
 #include "SoftwareSerial.h"
 //#include <AltSoftSerial.h>
@@ -18,7 +19,6 @@ SoftwareSerial mySerial(RX_PIN, TX_PIN); // Declare SoftwareSerial obj first
 
 Adafruit_Thermal printer(&mySerial);     // Pass addr to printer constructor
 
-bool gsmdebug = false;
 GSM gsmAccess(gsmdebug);
 GSM_SMS sms;
 
@@ -27,8 +27,6 @@ char senderNumber[20];
 
 bool usbdebug = false;
 bool debugWithPrint = false;
-
-//String allowedNumber = "+33645970094";
 
 void setup() {
   if (usbdebug == true) {
